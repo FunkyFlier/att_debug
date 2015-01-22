@@ -1021,7 +1021,7 @@ void _100HzTask(){
   _400HzTask();
   imu.UpdateLagIndex();
   _400HzTask();  
-  flightMode = L2;
+  //flightMode = L2;
   FlightSM();
   _400HzTask();
   MotorHandler();
@@ -1047,6 +1047,45 @@ void _100HzTask(){
     }
     imu.CorrectGPS();
 
+  }
+  
+   if (newRC == true){
+    newRC = false;
+    ProcessChannels();
+    GetSwitchPositions();
+    RCFailSafeCounter = 0;
+  }  
+  _400HzTask();
+  if (RCFailSafeCounter >= 200 || failSafe == true){
+    txFailSafe = true;
+    TIMSK5 = (0<<OCIE5A);
+    digitalWrite(13,LOW);
+    digitalWrite(RED,LOW);
+    digitalWrite(YELLOW,LOW);
+    digitalWrite(GREEN,LOW);
+    Motor1WriteMicros(1000);//set the output compare value
+    Motor2WriteMicros(1000);
+    Motor3WriteMicros(1000);
+    Motor4WriteMicros(1000);
+    Motor5WriteMicros(1000);
+    Motor6WriteMicros(1000);
+    //Motor7WriteMicros(1000);
+    //Motor8WriteMicros(1000);
+    if (failSafe == true){
+      digitalWrite(RED,HIGH);
+    }
+    while(1){
+      digitalWrite(YELLOW,HIGH);
+      if (RCFailSafeCounter >= 200 ){
+        digitalWrite(GREEN,LOW);
+      }
+      delay(500);
+      digitalWrite(YELLOW,LOW);
+      if (RCFailSafeCounter >= 200 ){
+        digitalWrite(GREEN,HIGH);
+      }
+      delay(500);
+    }
   }
 
   D23Low();

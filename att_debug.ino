@@ -833,9 +833,9 @@ void setup(){
   D28Output();
   D29Output();
 
-  //CheckESCFlag();
+  CheckESCFlag();
 
-  //DetectRC();
+  DetectRC();
 
   _200HzISRConfig();
 
@@ -844,8 +844,8 @@ void setup(){
 
 
 
-  //CalibrateESC();
-  //MotorInit();
+  CalibrateESC();
+  MotorInit();
   delay(3500);//this allows the telemetry radios to connect before trying the handshake
   if (handShake == false){
     radioStream = &Port2;
@@ -875,8 +875,8 @@ void setup(){
     ROMFlagsCheck();
   }
 
-  //ModeSelect();
-  //Arm();//move the rudder to the right to begin calibration
+  ModeSelect();
+  Arm();//move the rudder to the right to begin calibration
   BaroInit();
   //WaitForTempStab();
   GyroInit();
@@ -884,7 +884,7 @@ void setup(){
   MagInit();
   GetInitialQuat();
   GPSStart();
-  //CheckTXPositions();
+  CheckTXPositions();
   imu.DECLINATION = ToRad(fc_cross_track.val);
   imu.COS_DEC = cos(imu.DECLINATION);
   imu.SIN_DEC = sin(imu.DECLINATION);
@@ -947,6 +947,7 @@ void loop(){
       _100HzTask();
       break;
     }
+    
 
   }
 
@@ -1022,10 +1023,13 @@ void _100HzTask(){
   _400HzTask();  
   flightMode = L2;
   FlightSM();
+  _400HzTask();
   MotorHandler();
+  _400HzTask();
   if (GPSDetected == true){
     gps.Monitor();
   }
+  _400HzTask();
   if (gps.newData == true){
 
     gps.newData = false;
@@ -1044,6 +1048,7 @@ void _100HzTask(){
     imu.CorrectGPS();
 
   }
+
   D23Low();
 }
 

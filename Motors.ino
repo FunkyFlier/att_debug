@@ -105,8 +105,9 @@ void MotorInit(){
 
 }
 
+
 void MotorHandler(){
-    if (saveGainsFlag == true && (millis() - romWriteDelayTimer) > 2000){
+/*    if (saveGainsFlag == true && (millis() - romWriteDelayTimer) > 2000){
    j_ = 81;
    for(uint16_t i = KP_PITCH_RATE_; i <= MAG_DEC_; i++){
    EEPROM.write(j_++,(*floatPointerArray[i]).buffer[0]); 
@@ -124,8 +125,8 @@ void MotorHandler(){
    baroTimer = millis();
    _400HzTimer = imuTimer;
    
-   }
-/*  switch(motorState){
+   }*/
+switch(motorState){
   case HOLD:
 
     if (saveGainsFlag == true && (millis() - romWriteDelayTimer) > 2000){
@@ -149,25 +150,7 @@ void MotorHandler(){
     initialYaw = imu.yaw.val;
     integrate = false;
     HHState = 0;
-    /*PitchAngle.reset();
-     RollAngle.reset();
-     YawAngle.reset();
-     
-     PitchRate.reset();
-     RollRate.reset();
-     YawRate.reset();
-     
-     AltHoldPosition.reset();
-     AltHoldVelocity.reset();
-     
-     WayPointPosition.reset();
-     WayPointRate.reset();
-     
-     LoiterXPosition.reset();
-     LoiterXVelocity.reset();
-     
-     LoiterYPosition.reset();
-     LoiterYVelocity.reset();
+
     ZLoiterState = LOITERING;
     XYLoiterState = LOITERING;
     if (RCValue[THRO] > 1100){
@@ -189,54 +172,7 @@ void MotorHandler(){
     if (RCValue[RUDD] < 1300){
       motorState = TO;
 
-      //imu.inertialSumX = 0;
-      //imu.inertialSumY = 0;
-      /*imu.inertialSumZ = 0;
 
-      for(uint8_t i = 0; i < 20; i++){
-        while(micros() - imuTimer < 10000){
-          _400HzTask();
-        }
-        GetMag();
-        imu.magFlag =1;
-        _400HzTask();
-        imuDT = (micros() - imuTimer ) * 0.000001;
-        imuTimer = micros();
-        _400HzTask();
-        imu.kpAcc = kp_waypoint_position.val;
-        imu.kiAcc = ki_waypoint_position.val;
-        imu.kpMag = kd_waypoint_position.val;
-        imu.kiMag = fc_waypoint_position.val;
-        //imu.lagAmount = (uint8_t)kp_waypoint_velocity.val;
-        imu.kPosGPS = ki_waypoint_velocity.val;
-        imu.kVelGPS = kd_waypoint_velocity.val;
-        imu.kAccGPS = fc_waypoint_velocity.val;
-        imu.kPosBaro = kp_cross_track.val;
-        imu.kVelBaro = ki_cross_track.val;
-        imu.kAccBaro = kd_cross_track.val;
-
-        imu.DECLINATION = ToRad(fc_cross_track.val);
-        imu.COS_DEC = cos(imu.DECLINATION);
-        imu.SIN_DEC = sin(imu.DECLINATION);
-        //EstimateAttitude();
-
-        //EstimatePositionVelocity();
-        imu.GetInertial();
-        _400HzTask();
-        //imu.inertialSumX += imu.inertialX.val;
-        //imu.inertialSumY += imu.inertialY.val;
-        //imu.inertialSumZ += (imu.inertialZ.val + imu.initialAccMagnitude.val);
-        imu.inertialSumZ += imu.inertialZGrav.val;
-      }
-      //imu.inertialAvgX = imu.inertialSumX / 20.0;
-      //imu.inertialAvgY = imu.inertialSumY / 20.0;
-      //imu.inertialAvgZ = imu.inertialSumZ / 20.0;
-      imu.initialAccMagnitude.val = imu.inertialSumZ / 20.0;
-      //imu.GetInertial();
-      //imu.SetBias();
-      //imu.velX.val = 0;
-      //imu.velY.val = 0;
-      //imu.velZ.val = 0;
       PitchAngle.reset();
       RollAngle.reset();
       YawAngle.reset();
@@ -344,7 +280,7 @@ void MotorHandler(){
     /*motorCommand1.val = constrain((throttleCommand + throttleAdjustment.val + adjustmentY.val - adjustmentZ.val),1000,2000);
      motorCommand2.val = constrain((throttleCommand + throttleAdjustment.val - adjustmentX.val + adjustmentZ.val),1000,2000);
      motorCommand3.val = constrain((throttleCommand + throttleAdjustment.val - adjustmentY.val - adjustmentZ.val),1000,2000);
-     motorCommand4.val = constrain((throttleCommand + throttleAdjustment.val + adjustmentX.val + adjustmentZ.val),1000,2000);
+     motorCommand4.val = constrain((throttleCommand + throttleAdjustment.val + adjustmentX.val + adjustmentZ.val),1000,2000);*/
 
     break;
   case LANDING:
@@ -389,9 +325,9 @@ void MotorHandler(){
     /*    motorCommand1.val = constrain((throttleCommand + throttleAdjustment.val + adjustmentY.val - adjustmentZ.val),1000,2000);
      motorCommand2.val = constrain((throttleCommand + throttleAdjustment.val - adjustmentX.val + adjustmentZ.val),1000,2000);
      motorCommand3.val = constrain((throttleCommand + throttleAdjustment.val - adjustmentY.val - adjustmentZ.val),1000,2000);
-     motorCommand4.val = constrain((throttleCommand + throttleAdjustment.val + adjustmentX.val + adjustmentZ.val),1000,2000);
+     motorCommand4.val = constrain((throttleCommand + throttleAdjustment.val + adjustmentX.val + adjustmentZ.val),1000,2000);*/
     break;
-  }*/
+  }
 
   Motor1WriteMicros(motorCommand1.val);
   Motor2WriteMicros(motorCommand2.val);
@@ -400,47 +336,4 @@ void MotorHandler(){
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

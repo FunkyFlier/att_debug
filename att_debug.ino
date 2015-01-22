@@ -1019,6 +1019,8 @@ void _10HzTask(){
 void _100HzTask(){
   D23High();
   GetGyro();
+  GetMag();
+  imu.magFlag =1;
   _400HzTask();
 
   imu.AHRSupdate();
@@ -1060,6 +1062,27 @@ void _100HzTask(){
 
   }
 
+  PollPressure();
+  if (newBaro == true){
+    newBaro = false;
+    GetAltitude(&pressure.val,&pressureInitial,&baroAlt.val);
+    baroDT = (millis() - baroTimer) * 0.001;
+    baroTimer = millis();
+    baroZ.val  =  baroZ.val * 0.9 + baroAlt.val * 0.1;
+    if (baroDT <= 0.1){
+      baroRate = (baroZ.val - prevBaro) / baroDT;
+
+    }
+    else{
+      baroRate = 0;
+    }
+
+    baroVel.val = baroVel.val * 0.9 + baroRate * 0.1;
+    prevBaro = baroZ.val;
+    velZMeas.val = baroVel.val;
+    zMeas.val = baroZ.val;
+    imu.CorrectAlt();
+  }
   if (newRC == true){
     newRC = false;
     ProcessChannels();
@@ -1104,7 +1127,7 @@ void _100HzTask(){
 
 void _50HzTask(){
   D24High();
-  GetMag();
+/*  GetMag();
   imu.magFlag =1;
   PollPressure();
   if (newBaro == true){
@@ -1127,7 +1150,7 @@ void _50HzTask(){
     zMeas.val = baroZ.val;
     imu.CorrectAlt();
   }
-
+*/
   D24Low();
 }
 

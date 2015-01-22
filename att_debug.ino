@@ -947,7 +947,19 @@ void loop(){
       _100HzTask();
       break;
     }
-    
+    if (flightMode > 0){
+      PitchAngle.calculate();
+      RollAngle.calculate();
+      if (calcYaw == true){
+        YawAngle.calculate();
+      }
+    }
+    PitchRate.calculate();
+    RollRate.calculate();
+    YawRate.calculate();
+    MotorHandler();
+    _400HzTask();
+
 
   }
 
@@ -1024,8 +1036,7 @@ void _100HzTask(){
   //flightMode = L2;
   FlightSM();
   _400HzTask();
-  MotorHandler();
-  _400HzTask();
+
   if (GPSDetected == true){
     gps.Monitor();
   }
@@ -1048,8 +1059,8 @@ void _100HzTask(){
     imu.CorrectGPS();
 
   }
-  
-   if (newRC == true){
+
+  if (newRC == true){
     newRC = false;
     ProcessChannels();
     GetSwitchPositions();
@@ -1116,7 +1127,7 @@ void _50HzTask(){
     zMeas.val = baroZ.val;
     imu.CorrectAlt();
   }
-  
+
   D24Low();
 }
 
@@ -1396,6 +1407,7 @@ void LoiterCalculations(){
   tiltAngleX.val *= -1.0;
   LoiterYVelocity.calculate();
 }
+
 
 
 

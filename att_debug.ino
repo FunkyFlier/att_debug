@@ -169,7 +169,7 @@ enum CalibrationFlags {
 
 
 //motor defines
-#define FREQ 400
+#define FREQ 100
 #define PRESCALE 8
 #define PERIOD ((F_CPU/PRESCALE/FREQ) - 1)
 
@@ -883,7 +883,7 @@ void setup(){
   AccInit();
   MagInit();
   GetInitialQuat();
-  //GPSStart();
+  GPSStart();
   //CheckTXPositions();
   imu.DECLINATION = ToRad(fc_cross_track.val);
   imu.COS_DEC = cos(imu.DECLINATION);
@@ -978,7 +978,27 @@ void _400HzTask(){
 
 void _10HzTask(){
   D25High();
-  delayMicroseconds(100);
+  /* if (GPSDetected == true){
+   gps.Monitor();
+   }
+   if (gps.newData == true){
+   
+   gps.newData = false;
+   GPSFlag = true;
+   
+   floatLat.val = (gps.data.vars.lat) * 0.0000001;
+   floatLon.val = (gps.data.vars.lon) * 0.0000001;
+   gpsAlt.val = gps.data.vars.height * 0.001;
+   velN.val = gps.data.vars.velN * 0.01;
+   velE.val = gps.data.vars.velE * 0.01;
+   velD.val = gps.data.vars.velD * 0.01;
+   gps.DistBearing(&homeBase.lat.val,&homeBase.lon.val,&gps.data.vars.lat,&gps.data.vars.lon,&gpsX.val,&gpsY.val,&distToCraft,&headingToCraft);
+   if (gps.data.vars.gpsFix != 3){
+   gpsFailSafe = true;
+   }
+   imu.CorrectGPS();
+   
+   }*/
   D25Low();
 
 }
@@ -1003,6 +1023,27 @@ void _100HzTask(){
   flightMode = L2;
   FlightSM();
   MotorHandler();
+  if (GPSDetected == true){
+    gps.Monitor();
+  }
+  if (gps.newData == true){
+
+    gps.newData = false;
+    GPSFlag = true;
+
+    floatLat.val = (gps.data.vars.lat) * 0.0000001;
+    floatLon.val = (gps.data.vars.lon) * 0.0000001;
+    gpsAlt.val = gps.data.vars.height * 0.001;
+    velN.val = gps.data.vars.velN * 0.01;
+    velE.val = gps.data.vars.velE * 0.01;
+    velD.val = gps.data.vars.velD * 0.01;
+    gps.DistBearing(&homeBase.lat.val,&homeBase.lon.val,&gps.data.vars.lat,&gps.data.vars.lon,&gpsX.val,&gpsY.val,&distToCraft,&headingToCraft);
+    if (gps.data.vars.gpsFix != 3){
+      gpsFailSafe = true;
+    }
+    imu.CorrectGPS();
+
+  }
   D23Low();
 }
 
@@ -1031,6 +1072,7 @@ void _50HzTask(){
     zMeas.val = baroZ.val;
     imu.CorrectAlt();
   }
+  
   D24Low();
 }
 
@@ -1310,6 +1352,8 @@ void LoiterCalculations(){
   tiltAngleX.val *= -1.0;
   LoiterYVelocity.calculate();
 }
+
+
 
 
 

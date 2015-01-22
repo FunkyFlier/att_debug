@@ -10,7 +10,7 @@ ISR(TIMER5_COMPA_vect, ISR_NOBLOCK){
     watchDogFailSafeCounter++;
     RCFailSafeCounter++;
   }
-  ReadSerialStreams();
+  //ReadSerialStreams();
 
   if (watchDogFailSafeCounter >=200){
     TIMSK5 = (0<<OCIE5A);

@@ -727,7 +727,7 @@ float_u floatLat, floatLon;
 float_u outAccX,outAccY,outAccZ,GPSCourse,GPSVel,velN,velE,velD;
 
 uint32_t romWriteDelayTimer;
-
+uint32_t _400Time;
 float_u gpsX,gpsY;
 
 float unFiltZ;
@@ -907,35 +907,51 @@ void setup(){
 }
 
 void loop(){
+
+
+  D29High();
+  delayMicroseconds(10);
+  D29Low();
+  _400HzTask();
   loopTime = micros();
-  /*if ( loopTime - imuTimer >= 10000){
-   imuTimer = loopTime;
-   D22High();
-   delayMicroseconds(100);
-   D22Low();
-   }*/
-  if (loopTime - _400HzTimer >= 2500){
-    _400HzTimer = loopTime;
+  if (loopTime - imuTimer >= 10000){
+    imuTimer = loopTime;
     loopCount_++;
     switch(loopCount_){
+    case 2:
     case 4:
-      _400HzTask();
-      _100HzTask();
-      break;
+    case 6:
     case 8:
-      _400HzTask();
       _100HzTask();
       _50HzTask();
       tuningTrasnmitOK = true;
+      break;
+    case 10:
+      _100HzTask();
+      _50HzTask();
+      _10HzTask();
+      imu.kpAcc = kp_waypoint_position.val;
+      imu.kiAcc = ki_waypoint_position.val;
+      imu.kpMag = kd_waypoint_position.val;
+      imu.kiMag = fc_waypoint_position.val;
+      imu.FEEDBACK_LIMIT = kp_waypoint_velocity.val;
+      imu.kPosGPS = ki_waypoint_velocity.val;
+      imu.kVelGPS = kd_waypoint_velocity.val;
+      imu.kAccGPS = fc_waypoint_velocity.val;
+      imu.kPosBaro = kp_cross_track.val;
+      imu.kVelBaro = ki_cross_track.val;
+      imu.kAccBaro = kd_cross_track.val;
       loopCount_ = 0;
       break;
     default:
-      _400HzTask();
+      _100HzTask();
       break;
     }
 
   }
-  
+
+
+  _400HzTask();
   if (handShake == true){
     Radio();
 
@@ -949,21 +965,38 @@ void loop(){
   watchDogFailSafeCounter = 0;
 }
 
-
-
-
 void _400HzTask(){
-  D22High();
-  GetAcc();
-  GetGyro();
-  D22Low();
+  _400Time = micros();
+  if ( _400Time -_400HzTimer  >=2500 ){
+    _400HzTimer = _400Time;
+    D22High();
+    GetAcc();
+    D22Low();
+  }
+}
+
+
+void _10HzTask(){
+  D25High();
+  delayMicroseconds(100);
+  D25Low();
 
 }
 
 void _100HzTask(){
   D23High();
-  MotorHandler();
+  GetGyro();
+  _400HzTask();
+
   imu.AHRSupdate();
+  _400HzTask();
+  imu.GenerateRotationMatrix();
+  _400HzTask();
+  imu.GetEuler();
+  _400HzTask();
+  imu.GetInertial();
+  _400HzTask();
+  MotorHandler();
   D23Low();
 }
 
@@ -1255,6 +1288,12 @@ void LoiterCalculations(){
   tiltAngleX.val *= -1.0;
   LoiterYVelocity.calculate();
 }
+
+
+
+
+
+
 
 
 

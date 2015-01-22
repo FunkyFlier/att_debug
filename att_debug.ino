@@ -996,6 +996,12 @@ void _100HzTask(){
   _400HzTask();
   imu.GetInertial();
   _400HzTask();
+  imu.Predict();
+  _400HzTask();
+  imu.UpdateLagIndex();
+  _400HzTask();  
+  flightMode = L2;
+  FlightSM();
   MotorHandler();
   D23Low();
 }
@@ -1288,6 +1294,7 @@ void LoiterCalculations(){
   tiltAngleX.val *= -1.0;
   LoiterYVelocity.calculate();
 }
+
 
 
 

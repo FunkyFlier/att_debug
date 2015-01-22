@@ -1014,6 +1014,22 @@ void _50HzTask(){
   if (newBaro == true){
     newBaro = false;
     GetAltitude(&pressure.val,&pressureInitial,&baroAlt.val);
+    baroDT = (millis() - baroTimer) * 0.001;
+    baroTimer = millis();
+    baroZ.val  =  baroZ.val * 0.9 + baroAlt.val * 0.1;
+    if (baroDT <= 0.1){
+      baroRate = (baroZ.val - prevBaro) / baroDT;
+
+    }
+    else{
+      baroRate = 0;
+    }
+
+    baroVel.val = baroVel.val * 0.9 + baroRate * 0.1;
+    prevBaro = baroZ.val;
+    velZMeas.val = baroVel.val;
+    zMeas.val = baroZ.val;
+    imu.CorrectAlt();
   }
   D24Low();
 }

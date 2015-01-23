@@ -38,11 +38,9 @@ class openIMU{
 public:
   openIMU(float*, float*, float*, float*, float*, 
   float*, float*, float*, float*, float*, float*, float*,
-  float*, float*, float* , float*, float*, float*, float*, float*);
+  float*, float*, float* , float*, float*, float*, float*);
 
   void AHRSupdate(void);
-  void AHRSupdate2(void);
-  void IMUupdate(void);
   void GetEuler(void);
   void GetPitch(void);
   void GetRoll(void);
@@ -50,12 +48,9 @@ public:
   void InitialQuat(void);
   void GetGravOffset(void);
   void UpdateLagIndex(void);  
-  void IntegrateGyro(void);
   void GetInertial(void);
   void Predict(void);
   void CorrectGPS(void);
-  //void SetBias(void);
-  //void CorrectBaro(void);
   void CorrectAlt(void);
   void GenerateRotationMatrix(void);
 
@@ -89,7 +84,7 @@ public:
   float kPosGPS,kVelGPS,kAccGPS,kPosBaro,kVelBaro,kAccBaro;
   float R11,R12,R13,R21,R22,R23,R31,R32,R33;
   float inertialSumX,inertialSumY,inertialSumZ,inertialAvgX,inertialAvgY,inertialAvgZ;
-  float_u lagZVel;
+  float_u lagEstForDebug;
   uint8_t lagAmount;
   uint8_t magFlag;
 private:
@@ -104,7 +99,7 @@ private:
   float *mx;
   float *my;
   float *mz;
-  float *dt,*dt2;
+  float *dt;
   float *sax;//scaled accelerometer value
   float *say;
   float *saz;
@@ -116,13 +111,13 @@ private:
   float integralFBX,integralFBY,integralFBZ;
 
   float kiDTAcc,kiDTMag,dtby2;
-  float bx,by,bz,bx_,bz_,wx,wy,wz,vx,vy,vz;
+  float bx,by,bz,wx,wy,wz,vx,vy,vz;
   
   float hx,hy,hz,exm,eym,ezm,exa,eya,eza;
   float_u radPitch,radRoll,radYaw;
-  float xOrtho[3],yOrtho[3],zOrtho[3];
-  float xNorm[3],yNorm[3],zNorm[3];
-  float normScale,rotError,rotError2;
+  //float xOrtho[3],yOrtho[3],zOrtho[3];
+  //float xNorm[3],yNorm[3],zNorm[3];
+  //float normScale,rotError,rotError2;
 };
 
 

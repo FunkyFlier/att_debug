@@ -479,7 +479,8 @@ float RCScale[8];
 //timers and DTs
 uint32_t imuTimer,GPSTimer;
 uint32_t generalPurposeTimer;
-float imuDT,GPSDT;
+float imuDT;
+float GPSDT;
 
 //protocol related vars 
 
@@ -628,7 +629,6 @@ float magWInv21;
 float magWInv22;
 float accXScalePos, accYScalePos, accZScalePos, accXScaleNeg, accYScaleNeg, accZScaleNeg;
 
-float rateDT;
 
 float gravSum;
 float gravAvg;
@@ -749,12 +749,12 @@ float rotGyroX,rotGyroY,rotAccX,rotAccY;
 uint32_t loopTime;
 //constructors //fix the dts
 openIMU imu(&radianGyroX,&radianGyroY,&radianGyroZ,&accToFilterX,&accToFilterY,&accToFilterZ,&filtAccX.val,&filtAccY.val,&filtAccZ.val,
-&magToFiltX,&magToFiltY,&magToFiltZ,&gpsX.val,&gpsY.val,&zMeas.val,&velN.val,&velE.val,&velZMeas.val,&imuDT,&rateDT);
+&magToFiltX,&magToFiltY,&magToFiltZ,&gpsX.val,&gpsY.val,&zMeas.val,&velN.val,&velE.val,&velZMeas.val,&imuDT);
 //openIMU imu(&radianGyroX,&radianGyroY,&radianGyroZ,&accToFilterX,&accToFilterY,&accToFilterZ,&filtAccX.val,&filtAccY.val,&filtAccZ.val,&magToFiltX,&magToFiltY,&magToFiltZ,&gpsX.val,&gpsY.val,&baroZ.val,&zero,&zero,&imuDT);
 
-PID PitchRate(&rateSetPointY.val,&degreeGyroY.val,&adjustmentY.val,&integrate,&kp_pitch_rate.val,&ki_pitch_rate.val,&kd_pitch_rate.val,&fc_pitch_rate.val,&rateDT,400,400);
-PID RollRate(&rateSetPointX.val,&degreeGyroX.val,&adjustmentX.val,&integrate,&kp_roll_rate.val,&ki_roll_rate.val,&kd_roll_rate.val,&fc_roll_rate.val,&rateDT,400,400);
-PID YawRate(&rateSetPointZ.val,&degreeGyroZ.val,&adjustmentZ.val,&integrate,&kp_yaw_rate.val,&ki_yaw_rate.val,&kd_yaw_rate.val,&fc_yaw_rate.val,&rateDT,400,400);
+PID PitchRate(&rateSetPointY.val,&degreeGyroY.val,&adjustmentY.val,&integrate,&kp_pitch_rate.val,&ki_pitch_rate.val,&kd_pitch_rate.val,&fc_pitch_rate.val,&imuDT,400,400);
+PID RollRate(&rateSetPointX.val,&degreeGyroX.val,&adjustmentX.val,&integrate,&kp_roll_rate.val,&ki_roll_rate.val,&kd_roll_rate.val,&fc_roll_rate.val,&imuDT,400,400);
+PID YawRate(&rateSetPointZ.val,&degreeGyroZ.val,&adjustmentZ.val,&integrate,&kp_yaw_rate.val,&ki_yaw_rate.val,&kd_yaw_rate.val,&fc_yaw_rate.val,&imuDT,400,400);
 
 PID PitchAngle(&pitchSetPoint.val,&imu.pitch.val,&rateSetPointY.val,&integrate,&kp_pitch_attitude.val,&ki_pitch_attitude.val,&kd_pitch_attitude.val,&fc_pitch_attitude.val,&imuDT,800,800);
 PID RollAngle(&rollSetPoint.val,&imu.roll.val,&rateSetPointX.val,&integrate,&kp_roll_attitude.val,&ki_roll_attitude.val,&kd_roll_attitude.val,&fc_roll_attitude.val,&imuDT,800,800);
@@ -867,7 +867,6 @@ void setup(){
 
 
   if (calibrationMode == true){
-    //WaitForTempStab();
     BaroInit();
     AccInit();
     MagInit();
@@ -878,28 +877,24 @@ void setup(){
   ModeSelect();
   Arm();//move the rudder to the right to begin calibration
   BaroInit();
-  //WaitForTempStab();
   GyroInit();
   AccInit();
   MagInit();
   GetInitialQuat();
   GPSStart();
   CheckTXPositions();
-  imu.DECLINATION = ToRad(fc_cross_track.val);
+
+  imu.DECLINATION = ToRad(3.3);
   imu.COS_DEC = cos(imu.DECLINATION);
   imu.SIN_DEC = sin(imu.DECLINATION);
-  gpsFailSafe = false;
 
-  loopCount = 0;
+  gpsFailSafe = false;
   imuDT = 0.01;
-  rateDT = 0.0025;
   imuTimer = micros();
   _400HzTimer = micros();
   generalPurposeTimer = millis();
   currentTime = micros();
   watchDogStartCount = true;
-
-
   digitalWrite(RED,1);
   digitalWrite(YELLOW,1);
   digitalWrite(GREEN,1);
@@ -908,10 +903,6 @@ void setup(){
 
 void loop(){
 
-
-  D29High();
-  delayMicroseconds(10);
-  D29Low();
   _400HzTask();
   loopTime = micros();
   if (loopTime - imuTimer >= 10000){
@@ -927,9 +918,10 @@ void loop(){
     imu.kPosBaro = kp_cross_track.val;
     imu.kVelBaro = ki_cross_track.val;
     imu.kAccBaro = kd_cross_track.val;
+
     loopCount_ = 0;
-    D23High();
     GetGyro();
+    _400HzTask();
     GetMag();
     imu.magFlag =1;
     _400HzTask();
@@ -946,7 +938,6 @@ void loop(){
     _400HzTask();
     imu.UpdateLagIndex();
     _400HzTask();  
-    //flightMode = L2;
     FlightSM();
     _400HzTask();
 
@@ -974,6 +965,7 @@ void loop(){
     }
 
     PollPressure();
+    _400HzTask();
     if (newBaro == true){
       newBaro = false;
       GetAltitude(&pressure.val,&pressureInitial,&baroAlt.val);
@@ -994,6 +986,7 @@ void loop(){
       zMeas.val = baroZ.val;
       imu.CorrectAlt();
     }
+    _400HzTask();
     if (newRC == true){
       newRC = false;
       ProcessChannels();
@@ -1033,38 +1026,8 @@ void loop(){
       }
     }
 
-    D23Low();
 
-    /*switch(loopCount_){
-     case 2:
-     case 4:
-     case 6:
-     case 8:
-     _100HzTask();
-     _50HzTask();
-     tuningTrasnmitOK = true;
-     break;
-     case 10:
-     _100HzTask();
-     _50HzTask();
-     _10HzTask();
-     imu.kpAcc = kp_waypoint_position.val;
-     imu.kiAcc = ki_waypoint_position.val;
-     imu.kpMag = kd_waypoint_position.val;
-     imu.kiMag = fc_waypoint_position.val;
-     imu.FEEDBACK_LIMIT = kp_waypoint_velocity.val;
-     imu.kPosGPS = ki_waypoint_velocity.val;
-     imu.kVelGPS = kd_waypoint_velocity.val;
-     imu.kAccGPS = fc_waypoint_velocity.val;
-     imu.kPosBaro = kp_cross_track.val;
-     imu.kVelBaro = ki_cross_track.val;
-     imu.kAccBaro = kd_cross_track.val;
-     loopCount_ = 0;
-     break;
-     default:
-     _100HzTask();
-     break;
-     }*/
+    _400HzTask();
     if (flightMode > 0){
       PitchAngle.calculate();
       RollAngle.calculate();
@@ -1072,9 +1035,11 @@ void loop(){
         YawAngle.calculate();
       }
     }
+    _400HzTask();
     PitchRate.calculate();
     RollRate.calculate();
     YawRate.calculate();
+    _400HzTask();
     MotorHandler();
     tuningTrasnmitOK = true;
     _400HzTask();
@@ -1094,6 +1059,7 @@ void loop(){
     }
 
   }  
+  _400HzTask();
   watchDogFailSafeCounter = 0;
 }
 
@@ -1101,177 +1067,11 @@ void _400HzTask(){
   _400Time = micros();
   if ( _400Time -_400HzTimer  >=2500 ){
     _400HzTimer = _400Time;
-    D22High();
     GetAcc();
-    D22Low();
   }
 }
 
 
-void _10HzTask(){
-  D25High();
-  /* if (GPSDetected == true){
-   gps.Monitor();
-   }
-   if (gps.newData == true){
-   
-   gps.newData = false;
-   GPSFlag = true;
-   
-   floatLat.val = (gps.data.vars.lat) * 0.0000001;
-   floatLon.val = (gps.data.vars.lon) * 0.0000001;
-   gpsAlt.val = gps.data.vars.height * 0.001;
-   velN.val = gps.data.vars.velN * 0.01;
-   velE.val = gps.data.vars.velE * 0.01;
-   velD.val = gps.data.vars.velD * 0.01;
-   gps.DistBearing(&homeBase.lat.val,&homeBase.lon.val,&gps.data.vars.lat,&gps.data.vars.lon,&gpsX.val,&gpsY.val,&distToCraft,&headingToCraft);
-   if (gps.data.vars.gpsFix != 3){
-   gpsFailSafe = true;
-   }
-   imu.CorrectGPS();
-   
-   }*/
-  D25Low();
-
-}
-
-void _100HzTask(){
-  /*  D23High();
-   GetGyro();
-   GetMag();
-   imu.magFlag =1;
-   _400HzTask();
-   
-   imu.AHRSupdate();
-   _400HzTask();
-   imu.GenerateRotationMatrix();
-   _400HzTask();
-   imu.GetEuler();
-   _400HzTask();
-   imu.GetInertial();
-   _400HzTask();
-   imu.Predict();
-   _400HzTask();
-   imu.UpdateLagIndex();
-   _400HzTask();  
-   //flightMode = L2;
-   FlightSM();
-   _400HzTask();
-   
-   if (GPSDetected == true){
-   gps.Monitor();
-   }
-   _400HzTask();
-   if (gps.newData == true){
-   
-   gps.newData = false;
-   GPSFlag = true;
-   
-   floatLat.val = (gps.data.vars.lat) * 0.0000001;
-   floatLon.val = (gps.data.vars.lon) * 0.0000001;
-   gpsAlt.val = gps.data.vars.height * 0.001;
-   velN.val = gps.data.vars.velN * 0.01;
-   velE.val = gps.data.vars.velE * 0.01;
-   velD.val = gps.data.vars.velD * 0.01;
-   gps.DistBearing(&homeBase.lat.val,&homeBase.lon.val,&gps.data.vars.lat,&gps.data.vars.lon,&gpsX.val,&gpsY.val,&distToCraft,&headingToCraft);
-   if (gps.data.vars.gpsFix != 3){
-   gpsFailSafe = true;
-   }
-   imu.CorrectGPS();
-   
-   }
-   
-   PollPressure();
-   if (newBaro == true){
-   newBaro = false;
-   GetAltitude(&pressure.val,&pressureInitial,&baroAlt.val);
-   baroDT = (millis() - baroTimer) * 0.001;
-   baroTimer = millis();
-   baroZ.val  =  baroZ.val * 0.9 + baroAlt.val * 0.1;
-   if (baroDT <= 0.1){
-   baroRate = (baroZ.val - prevBaro) / baroDT;
-   
-   }
-   else{
-   baroRate = 0;
-   }
-   
-   baroVel.val = baroVel.val * 0.9 + baroRate * 0.1;
-   prevBaro = baroZ.val;
-   velZMeas.val = baroVel.val;
-   zMeas.val = baroZ.val;
-   imu.CorrectAlt();
-   }
-   if (newRC == true){
-   newRC = false;
-   ProcessChannels();
-   GetSwitchPositions();
-   RCFailSafeCounter = 0;
-   }  
-   _400HzTask();
-   if (RCFailSafeCounter >= 200 || failSafe == true){
-   txFailSafe = true;
-   TIMSK5 = (0<<OCIE5A);
-   digitalWrite(13,LOW);
-   digitalWrite(RED,LOW);
-   digitalWrite(YELLOW,LOW);
-   digitalWrite(GREEN,LOW);
-   Motor1WriteMicros(1000);//set the output compare value
-   Motor2WriteMicros(1000);
-   Motor3WriteMicros(1000);
-   Motor4WriteMicros(1000);
-   Motor5WriteMicros(1000);
-   Motor6WriteMicros(1000);
-   //Motor7WriteMicros(1000);
-   //Motor8WriteMicros(1000);
-   if (failSafe == true){
-   digitalWrite(RED,HIGH);
-   }
-   while(1){
-   digitalWrite(YELLOW,HIGH);
-   if (RCFailSafeCounter >= 200 ){
-   digitalWrite(GREEN,LOW);
-   }
-   delay(500);
-   digitalWrite(YELLOW,LOW);
-   if (RCFailSafeCounter >= 200 ){
-   digitalWrite(GREEN,HIGH);
-   }
-   delay(500);
-   }
-   }
-   
-   D23Low();*/
-}
-
-void _50HzTask(){
-  D24High();
-  /*  GetMag();
-   imu.magFlag =1;
-   PollPressure();
-   if (newBaro == true){
-   newBaro = false;
-   GetAltitude(&pressure.val,&pressureInitial,&baroAlt.val);
-   baroDT = (millis() - baroTimer) * 0.001;
-   baroTimer = millis();
-   baroZ.val  =  baroZ.val * 0.9 + baroAlt.val * 0.1;
-   if (baroDT <= 0.1){
-   baroRate = (baroZ.val - prevBaro) / baroDT;
-   
-   }
-   else{
-   baroRate = 0;
-   }
-   
-   baroVel.val = baroVel.val * 0.9 + baroRate * 0.1;
-   prevBaro = baroZ.val;
-   velZMeas.val = baroVel.val;
-   zMeas.val = baroZ.val;
-   imu.CorrectAlt();
-   }
-   */
-  D24Low();
-}
 
 void FlightSM(){
 
@@ -1549,6 +1349,8 @@ void LoiterCalculations(){
   tiltAngleX.val *= -1.0;
   LoiterYVelocity.calculate();
 }
+
+
 
 
 

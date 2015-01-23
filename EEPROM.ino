@@ -123,7 +123,7 @@ void AssignPointerArray(){
 
   floatPointerArray[TARGET_VEL_WP] = &velZMeas;
   floatPointerArray[POS_ERR] = &ultraSonicRange;
-  floatPointerArray[ACC_CIR] = &imu.lagZVel;
+  floatPointerArray[ACC_CIR] = &imu.lagEstForDebug;
   floatPointerArray[DR_VEL_X] = &velN;
   floatPointerArray[DR_VEL_Y] = &velE;
   floatPointerArray[DR_POS_X] = &drPosX;

@@ -805,12 +805,12 @@ void GetAcc(){
   accY.val = tempY;
 #endif
 
-  shiftedAccX.val  = accX.val - -0.5;
-  shiftedAccY.val  = accY.val - -2;
-  shiftedAccZ.val  = accZ.val - 2.5;
-  scaledAccX.val = shiftedAccX.val * 0.01919686581782566111655239960823;
-  scaledAccY.val = shiftedAccY.val * 0.01932938856015779092702169625247;
-  scaledAccZ.val = shiftedAccZ.val * 0.01950248756218905472636815920398;
+  shiftedAccX.val  = accX.val - -2.5;
+  shiftedAccY.val  = accY.val - -0.5;
+  shiftedAccZ.val  = accZ.val - 1.5;
+  scaledAccX.val = shiftedAccX.val * 0.01942517343904856293359762140733;
+  scaledAccY.val = shiftedAccY.val * 0.01946375372393247269116186693148;
+  scaledAccZ.val = shiftedAccZ.val * 0.01934846989141164856860809476802;
 
 
   filtAccX.val = filtAccX.val * 0.9 + scaledAccX.val * 0.1;

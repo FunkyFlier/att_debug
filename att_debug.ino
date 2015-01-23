@@ -9,7 +9,7 @@
 #include <AUXMATH.h>
 #include "UBLOXL.h"
 
-//#define ROT_45
+#define ROT_45
 
 #define FREQ_TRIG 20
 #define PRESCALE_TRIG 64
@@ -918,7 +918,7 @@ void loop(){
     imu.kPosBaro = kp_cross_track.val;
     imu.kVelBaro = ki_cross_track.val;
     imu.kAccBaro = kd_cross_track.val;
-
+    imu.lagAmount = (uint8_t)fc_cross_track.val;
     loopCount_ = 0;
     GetGyro();
     _400HzTask();
@@ -971,7 +971,7 @@ void loop(){
       GetAltitude(&pressure.val,&pressureInitial,&baroAlt.val);
       baroDT = (millis() - baroTimer) * 0.001;
       baroTimer = millis();
-      baroZ.val  =  baroZ.val * 0.9 + baroAlt.val * 0.1;
+      baroZ.val  =  baroZ.val * 0.85 + baroAlt.val * 0.15;
       if (baroDT <= 0.1){
         baroRate = (baroZ.val - prevBaro) / baroDT;
 
@@ -980,7 +980,7 @@ void loop(){
         baroRate = 0;
       }
 
-      baroVel.val = baroVel.val * 0.9 + baroRate * 0.1;
+      baroVel.val = baroVel.val * 0.5 + baroRate * 0.5;
       prevBaro = baroZ.val;
       velZMeas.val = baroVel.val;
       zMeas.val = baroZ.val;

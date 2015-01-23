@@ -25,8 +25,8 @@
  #define kiAcc 40.0
  #define kpMag 400.0
  #define kiMag 40.0*/
-#define LAG_SIZE 60
-#define LAG_SIZE_BARO 25
+#define LAG_SIZE 51
+#define LAG_SIZE_BARO 26
 //#define DECLINATION ToRad(3.3)
 //#define COS_DEC cos(DECLINATION)
 //#define SIN_DEC sin(DECLINATION) 
@@ -84,7 +84,7 @@ public:
   float kPosGPS,kVelGPS,kAccGPS,kPosBaro,kVelBaro,kAccBaro;
   float R11,R12,R13,R21,R22,R23,R31,R32,R33;
   float inertialSumX,inertialSumY,inertialSumZ,inertialAvgX,inertialAvgY,inertialAvgZ;
-  float_u lagEstForDebug;
+  float_u lagEstForDebugVel,lagEstForDebugPos;
   uint8_t lagAmount;
   uint8_t magFlag;
 private:

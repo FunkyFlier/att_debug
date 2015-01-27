@@ -292,8 +292,8 @@ switch(motorState){
         throttleCheckFlag = false;
       }
     }
-    throttleCommand = 1450;
-    if ( (1450 + throttleAdjustment.val) < 1250){
+    throttleCommand = 1550;
+    if ( (1550 + throttleAdjustment.val) < 1250){
       motorCommand1.val = 1000;
       motorCommand2.val = 1000;
       motorCommand3.val = 1000;

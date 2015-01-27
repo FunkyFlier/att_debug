@@ -187,12 +187,12 @@ void openIMU::Predict(void){
 
 
 
-  biasedX = (*sax - accelBiasX.val);
-  biasedY = (*say - accelBiasY.val);
-  biasedZ = (*saz - accelBiasZ.val);
-  inertialXBiased.val = R11 * biasedX + R21 * biasedY + R31 * biasedZ;//  - inertialXOffSet.val;
-  inertialYBiased.val = R12 * biasedX + R22 * biasedY + R32 * biasedZ;// - inertialYOffSet.val;
-  inertialZBiased.val = R13 * biasedX + R23 * biasedY + R33 * biasedZ - initialAccMagnitude.val;// - inertialZOffSet.val; 
+  biasedX.val = (*sax - accelBiasX.val);
+  biasedY.val = (*say - accelBiasY.val);
+  biasedZ.val = (*saz - accelBiasZ.val);
+  inertialXBiased.val = R11 * biasedX.val + R21 * biasedY.val + R31 * biasedZ.val;//  - inertialXOffSet.val;
+  inertialYBiased.val = R12 * biasedX.val + R22 * biasedY.val + R32 * biasedZ.val;// - inertialYOffSet.val;
+  inertialZBiased.val = R13 * biasedX.val + R23 * biasedY.val + R33 * biasedZ.val - initialAccMagnitude.val;// - inertialZOffSet.val; 
 
 
 

@@ -21,7 +21,7 @@
 #define FLOOR 2
 #define TAKE_OFF_ALT 3
 
-#define LAND_VEL -0.3
+#define LAND_VEL -0.1
 //LED defines
 #define RED 38
 #define YELLOW 40

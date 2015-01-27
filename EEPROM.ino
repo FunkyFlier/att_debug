@@ -102,9 +102,9 @@ void AssignPointerArray(){
   floatPointerArray[RATE_SP_X] = &rateSetPointX;
   floatPointerArray[RATE_SP_Y] = &rateSetPointY;
   floatPointerArray[RATE_SP_Z] = &rateSetPointZ;
-  floatPointerArray[ADJ_X] = &adjustmentX;
-  floatPointerArray[ADJ_Y] = &adjustmentY;
-  floatPointerArray[ADJ_Z] = &adjustmentZ;
+  floatPointerArray[ADJ_X] = &imu.inertialXBiased;
+  floatPointerArray[ADJ_Y] = &imu.inertialYBiased;
+  floatPointerArray[ADJ_Z] = &imu.inertialZBiased;
   floatPointerArray[PITCH_SP] = &pitchSetPoint;
   floatPointerArray[ROLL_SP] = &rollSetPoint;
   floatPointerArray[YAW_SP] = &yawSetPoint;

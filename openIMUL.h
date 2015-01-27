@@ -87,9 +87,10 @@ public:
   float_u lagEstForDebugVel,lagEstForDebugPos;
   uint8_t lagAmount;
   uint8_t magFlag;
+  float_u biasedX,biasedY,biasedZ;
 private:
 
-  float biasedX,biasedY,biasedZ;
+  
   float *gx;
   float *gy;
   float *gz;

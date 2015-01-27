@@ -192,6 +192,8 @@ switch(motorState){
 
       LoiterYPosition.reset();
       LoiterYVelocity.reset();
+      homeBaseXOffset = imu.XEst.val;
+      homeBaseYOffset = imu.YEst.val;
       UpdateOffset();
     }
 

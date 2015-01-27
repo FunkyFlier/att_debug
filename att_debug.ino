@@ -1177,7 +1177,6 @@ void FlightSM(){
     digitalWrite(GREEN,HIGH);
     if (enterState == true){
       enterState = false;
-      enterState = false;
       xTarget.val = imu.XEst.val;
       yTarget.val = imu.YEst.val;
       zTarget.val = imu.ZEst.val + 1; 
@@ -1266,7 +1265,7 @@ void RTBStateMachine(){
     break;
   case TRAVEL:
     //make special PID loops for the loiter positions
-    if (fabs(xTarget.val - imu.XEst.val) < 1.5){
+    /*if (fabs(xTarget.val - imu.XEst.val) < 1.5){
       velSetPointX.val = 0;
     }
     else{
@@ -1277,20 +1276,20 @@ void RTBStateMachine(){
     }
     else{
 
-    }
+    }*/
     LoiterXPosition.calculate();
     LoiterYPosition.calculate();
-    if (velSetPointX.val > 0.5){
-      velSetPointX.val = 0.5;
+    if (velSetPointX.val > 0.25){
+      velSetPointX.val = 0.25;
     }
-    if (velSetPointX.val < -0.5){
-      velSetPointX.val = -0.5;
+    if (velSetPointX.val < -0.25){
+      velSetPointX.val = -0.25;
     }
-    if (velSetPointY.val > 0.5){
-      velSetPointY.val = 0.5;
+    if (velSetPointY.val > 0.25){
+      velSetPointY.val = 0.25;
     }
-    if (velSetPointY.val < -0.5){
-      velSetPointY.val = -0.5;
+    if (velSetPointY.val < -0.25){
+      velSetPointY.val = -0.25;
     }
     LoiterXVelocity.calculate();
     tiltAngleX.val *= -1.0;
@@ -1299,13 +1298,15 @@ void RTBStateMachine(){
     AltHoldPosition.calculate();
     AltHoldVelocity.calculate();
     //if (fabs(imu.XEst.val - homeBaseXOffset) < 1 && fabs(imu.YEst.val - homeBaseYOffset) < 1){
-    if (fabs(imu.XEst.val) < 1 && fabs(imu.YEst.val) < 1){
+    if (fabs(imu.XEst.val + homeBaseXOffset) < 0.25 && fabs(imu.YEst.val + homeBaseYOffset) < 0.25){
       velSetPointZ.val = LAND_VEL;
       RTBState = DESCEND;
+      motorState = LANDING;
     }
     if (gpsFailSafe == true){
       velSetPointZ.val = LAND_VEL;
       RTBState = DESCEND;
+      motorState = LANDING;
     }
     break;
   case DESCEND:
@@ -1322,27 +1323,14 @@ void RTBStateMachine(){
       LoiterCalculations();
       RotatePitchRoll(&imu.yaw.val,&zero,&tiltAngleX.val,&tiltAngleY.val,&pitchSetPoint.val,&rollSetPoint.val);
     }
-    velSetPointZ.val = LAND_VEL;
+    //velSetPointZ.val = LAND_VEL;
     AltHoldVelocity.calculate();
-    motorState = LANDING;
+    //motorState = LANDING;
     break;
   }  
 }
 
 void LoiterCalculations(){
-  //make special PID loops for the loiter positions
-  /*if (fabs(xTarget.val - imu.XEst.val) < 1.5){
-   velSetPointX.val = 0;
-   }
-   else{
-   LoiterXPosition.calculate();
-   }
-   if (fabs(yTarget.val - imu.YEst.val) < 1.5){
-   velSetPointY.val = 0;
-   }
-   else{
-   LoiterYPosition.calculate();
-   }*/
   LoiterXPosition.calculate();
   LoiterYPosition.calculate();
   LoiterXVelocity.calculate();

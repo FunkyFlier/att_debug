@@ -160,7 +160,7 @@ void AssignPointerArray(){
   int32PointerArray[LAT_] = &lattitude;
   int32PointerArray[LON_] = &longitude;
 
-  bytePointerArray[FLIGHT_MODE] = &pingFlag;
+  bytePointerArray[FLIGHT_MODE] = &flightMode;
   bytePointerArray[RTB_STATE] = &RTBState;
   bytePointerArray[Z_LOIT] = &ZLoiterState;
   bytePointerArray[XY_LOIT] = &XYLoiterState;

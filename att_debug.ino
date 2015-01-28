@@ -1044,7 +1044,6 @@ void loop(){
     tuningTrasnmitOK = true;
     _400HzTask();
 
-
   }
 
 
@@ -1251,7 +1250,7 @@ void RTBStateMachine(){
     RotatePitchRoll(&imu.yaw.val,&zero,&tiltAngleX.val,&tiltAngleY.val,&pitchSetPoint.val,&rollSetPoint.val);
     AltHoldPosition.calculate();
     AltHoldVelocity.calculate();
-    if (imu.ZEst.val >= zTarget.val){
+    if (imu.ZEst.val >= (zTarget.val - 0.1) ){
 
       RTBState = TRAVEL;
       xTarget.val = 0 + homeBaseXOffset;

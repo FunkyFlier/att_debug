@@ -796,7 +796,6 @@ void setup(){
   //digitalWrite(RED,HIGH);
   pinMode(13,OUTPUT);
   RC_SS_Output();
-  MotorInit();
   Port0.begin(115200);
   Port2.begin(115200);
   Port2.write(0x0D);
@@ -918,12 +917,15 @@ void loop(){
     imu.kPosBaro = kp_cross_track.val;
     imu.kVelBaro = ki_cross_track.val;
     imu.kAccBaro = kd_cross_track.val;
-    imu.lagAmount = (uint8_t)fc_cross_track.val;
+    imu.DECLINATION = ToRad(fc_cross_track.val);
+    imu.COS_DEC = cos(imu.DECLINATION);
+    imu.SIN_DEC = sin(imu.DECLINATION);
+    //imu.lagAmount = (uint8_t)fc_cross_track.val;
     loopCount_ = 0;
     GetGyro();
     _400HzTask();
     GetMag();
-    imu.magFlag =1;
+    //imu.magFlag =1;
     _400HzTask();
 
     imu.AHRSupdate();
@@ -1265,17 +1267,17 @@ void RTBStateMachine(){
   case TRAVEL:
     //make special PID loops for the loiter positions
     /*if (fabs(xTarget.val - imu.XEst.val) < 1.5){
-      velSetPointX.val = 0;
-    }
-    else{
-
-    }
-    if (fabs(yTarget.val - imu.YEst.val) < 1.5){
-      velSetPointY.val = 0;
-    }
-    else{
-
-    }*/
+     velSetPointX.val = 0;
+     }
+     else{
+     
+     }
+     if (fabs(yTarget.val - imu.YEst.val) < 1.5){
+     velSetPointY.val = 0;
+     }
+     else{
+     
+     }*/
     LoiterXPosition.calculate();
     LoiterYPosition.calculate();
     if (velSetPointX.val > 0.25){
@@ -1336,6 +1338,7 @@ void LoiterCalculations(){
   tiltAngleX.val *= -1.0;
   LoiterYVelocity.calculate();
 }
+
 
 
 

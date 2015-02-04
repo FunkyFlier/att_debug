@@ -86,7 +86,7 @@ public:
   float inertialSumX,inertialSumY,inertialSumZ,inertialAvgX,inertialAvgY,inertialAvgZ;
   float_u lagEstForDebugVel,lagEstForDebugPos;
   uint8_t lagAmount;
-  uint8_t magFlag;
+  //uint8_t magFlag;
   float_u biasedX,biasedY,biasedZ;
 private:
 

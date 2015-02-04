@@ -92,7 +92,7 @@ void openIMU::UpdateLagIndex(void){
   if (currentEstIndex == (LAG_SIZE)){
     currentEstIndex = 0;
   }
-  
+
   lagIndex = currentEstIndex - 50;
 
 
@@ -213,14 +213,14 @@ void openIMU::Predict(void){
 
   XVelHist[currentEstIndex] = velX.val;
   YVelHist[currentEstIndex] = velY.val;
-  
+
   //lagEstForDebug.val = XVelHist[lagIndex];
 
 
   ZEstHist[currentEstIndex_z] = ZEst.val;
   ZVelHist[currentEstIndex_z] = velZ.val;
-  
-  
+
+
   lagEstForDebugVel.val = -1.0 * ZVelHist[lagIndex_z];
   lagEstForDebugPos.val = -1.0 * ZEstHist[lagIndex_z];
 
@@ -297,7 +297,30 @@ void openIMU::AHRSupdate() {
     *ax *= recipNorm;
     *ay *= recipNorm;
     *az *= recipNorm;
-    if (magFlag == 1){
+
+    recipNorm = InvSqrt(*mx * *mx + *my * *my + *mz * *mz);
+    *mx *= recipNorm;
+    *my *= recipNorm;
+    *mz *= recipNorm;
+
+    hx = R11 * *mx + R21 * *my + R31 * *mz;
+    hy = R12 * *mx + R22 * *my + R32 * *mz;
+    hz = R13 * *mx + R23 * *my + R33 * *mz;
+
+
+    bx = sqrt(hx * hx + hy * hy);
+    bz = hz;
+
+
+    wx = R11*bx + R13*bz;
+    wy = R21*bx + R23*bz;
+    wz = R31*bx + R33*bz;
+
+
+    exm = (*my * wz - *mz * wy);
+    eym = (*mz * wx - *mx * wz);
+    ezm = (*mx * wy - *my * wx);
+    /*if (magFlag == 1){
       recipNorm = InvSqrt(*mx * *mx + *my * *my + *mz * *mz);
       *mx *= recipNorm;
       *my *= recipNorm;
@@ -325,7 +348,7 @@ void openIMU::AHRSupdate() {
       exm = 0;
       eym = 0;
       ezm = 0;
-    }
+    }*/
 
 
     vx = R13;
@@ -444,6 +467,7 @@ void openIMU::GetYaw(void){
     yaw.val +=360;
   }
 }
+
 
 
 

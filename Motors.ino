@@ -1,6 +1,17 @@
 void CheckESCFlag(){
+
   if (EEPROM.read(428) == 0xAA){
-    MotorInit();
+    DDRE |= B00111000;
+    DDRH |= B00111000;
+
+
+    TCCR3A = (1<<WGM31)|(1<<COM3A1)|(1<<COM3B1)|(1<<COM3C1);  
+    TCCR3B = (1<<WGM33)|(1<<WGM32)|(1<<CS31);               
+    ICR3 = PERIOD;   
+
+    TCCR4A = (1<<WGM41)|(1<<COM4A1)|(1<<COM4B1)|(1<<COM4C1);
+    TCCR4B = (1<<WGM43)|(1<<WGM42)|(1<<CS41);
+    ICR4 = PERIOD;  
     Motor1WriteMicros(2000);//set the output compare value
     Motor2WriteMicros(2000);
     Motor3WriteMicros(2000);
@@ -41,7 +52,7 @@ void CheckESCFlag(){
 }
 
 void CalibrateESC(){
-  delay(500);//wait for new frame
+  delay(100);//wait for new frame
 
   while(newRC == false){
 
@@ -107,7 +118,7 @@ void MotorInit(){
 
 
 void MotorHandler(){
-/*    if (saveGainsFlag == true && (millis() - romWriteDelayTimer) > 2000){
+  /*    if (saveGainsFlag == true && (millis() - romWriteDelayTimer) > 2000){
    j_ = 81;
    for(uint16_t i = KP_PITCH_RATE_; i <= MAG_DEC_; i++){
    EEPROM.write(j_++,(*floatPointerArray[i]).buffer[0]); 
@@ -126,7 +137,7 @@ void MotorHandler(){
    _400HzTimer = imuTimer;
    
    }*/
-switch(motorState){
+  switch(motorState){
   case HOLD:
 
     if (saveGainsFlag == true && (millis() - romWriteDelayTimer) > 2000){
@@ -338,4 +349,5 @@ switch(motorState){
 
 
 }
+
 

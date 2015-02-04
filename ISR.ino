@@ -27,10 +27,14 @@ ISR(TIMER5_COMPA_vect, ISR_NOBLOCK){
     //Motor7WriteMicros(1000);
     //Motor8WriteMicros(1000);
     while(1){
-      digitalWrite(RED,HIGH);
+      digitalWrite(13,LOW);
+      digitalWrite(RED,LOW);
+      digitalWrite(YELLOW,LOW);
       digitalWrite(GREEN,LOW);
       delay(500);
-      digitalWrite(RED,LOW);
+      digitalWrite(13,HIGH);
+      digitalWrite(RED,HIGH);
+      digitalWrite(YELLOW,HIGH);
       digitalWrite(GREEN,HIGH);
       delay(500);
     }
